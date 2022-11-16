@@ -1,0 +1,120 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: sans-serif;
+}
+
+
+.movieContainer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    justify-content: center;
+    border: 2px solid black;
+    border-radius: 2px;
+    
+}
+
+.eventCardContainer {
+    display: grid;
+    grid-template-rows: auto 20% 10% 20% 10% ;
+    width: 50%;
+
+    text-align: center;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+    border: 2px solid transparent;
+    border-radius: 2px;
+    margin-bottom: 1px;
+    padding: 2%;
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+.eventName {
+    margin: 0px;
+    font-size: large;
+}
+
+
+.eventImg {
+    width: 50%;
+    height: auto;
+    margin-left: auto ;
+    margin-right: auto ;
+    border: 2px solid black ;
+    border-radius: 10px;
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+.eventSS {
+    max-height: 100%;
+    overflow-y: hidden;
+    overflow-x: hidden;
+}
+
+.eventDesc {
+    max-height: 100%;
+    padding: 0px;
+    margin: 0px;
+    overflow-y: hidden;
+}
+
+.eventRating {
+    margin: 0px;
+    border: 5px solid transparent;
+}
+
+
+.eventCardContainer:hover {
+    border: 2px solid blue;
+    border-radius: 10px;
+}
+
+header {
+    text-align: center;
+    padding: 1%;
+
+    border-radius: 2px;
+    border: 2px solid black;
+    margin-bottom: 2px;
+}
+
+button {
+    border: 1px solid black;
+    border-radius: 5px;
+    background-color: white;
+}
+
+button:hover {
+    background-color: lightblue;
+    opacity: 99%;
+}
+
+.searchContainer{
+    display: flex;
+    border: 2px solid black;
+    border-radius: 5px;
+    padding: 5%;
+    background-color: transparent;
+    align-items: center;
+    justify-content: space-around;
+}
+
+@media (width > 600px) {
+    .eventCardContainer{
+        width: 25%
+    }
+}
+
+@media (600px < width < 800px) {
+    .eventCardContainer{
+        width: 33.33%
+    }
+}
+
+

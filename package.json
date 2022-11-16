@@ -1,0 +1,24 @@
+{
+  "name": "w7_d2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "getMovie.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AhmedK2151/movieApp_V2.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AhmedK2151/movieApp_V2/issues"
+  },
+  "homepage": "https://github.com/AhmedK2151/movieApp_V2#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "sequelize": "^6.25.6",
+    "sqlite3": "^5.1.2"
+  }
+}
