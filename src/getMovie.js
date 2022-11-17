@@ -192,7 +192,6 @@ function createCard(title, description, image, rating, releaseDate, streamingSer
 
     const eventLinks = document.createElement("a")
     eventLinks.classList.add(`eventLinks`)
-    console.log("this is a link check " + link)
     if (link.length > 0){
         eventLinks.href = link
         eventLinks.innerHTML = "Where to Watch"

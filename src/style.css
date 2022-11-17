@@ -52,7 +52,6 @@ body {
     display: flex;
     flex-direction: row;
     overflow-x: scroll;
-    justify-content: space-around;
 }
 
 
@@ -127,6 +126,13 @@ input[type="search"]:focus {
     border-radius: 8px;
 }
 
+input.searchbox[type="search"]::-webkit-search-decoration,
+input.searchbox[type="search"]::-webkit-search-cancel-button,
+input.searchbox[type="search"]::-webkit-search-results-button,
+input.searchbox[type="search"]::-webkit-search-results-decoration {
+  display: none; 
+}
+
 .searchButton {
     border: 3px solid  lightgray;
     background-color: transparent;
@@ -168,5 +174,6 @@ input[type="search"]:focus {
         width: 100%
     }
 }
+
 
 
