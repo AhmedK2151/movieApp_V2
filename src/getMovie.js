@@ -3,52 +3,58 @@ const frontPageArray = []
 const slideShowArray = []
 
 async function getMovie(name) {
-    const response = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=faac618f8b55fe67036720b29d0f430d&query=${name}`)
-    const data = await response.json()
-    var providerObject;
-
-    if(data.total_results > 0) {  //making sure that the name is valid
-
-        //console.log("This is the data: " + JSON.stringify(data, null, 5))
-        
-        const movieData = data.results
-
-        for(let i = 0; i < movieData.length; i++) {   //getting the movie info
-
-            const individualMovie = {"image": movieData[i].poster_path ,"title" : movieData[i].title, "movie_id": movieData[i].id, "overview": movieData[i].overview, "rating": movieData[i].vote_average, "release_date": movieData[i].release_date, "providers": []}
-            //console.log(individualMovie)
-
-            const getMovie_id = movieData[i].id
-            const response2 = await fetch(`https://api.themoviedb.org/3/movie/${getMovie_id}/watch/providers?api_key=faac618f8b55fe67036720b29d0f430d`)
-            const data2 = await response2.json()
-            const ssP = data2.results.GB //ssp = streaming service providers
-            //console.log(`Link: ${JSON.stringify(ssP.link, null,4)}`)
-            for(let j in ssP) { //getting the steaming service providers
-                if( j == "link") { //checking if there is a link to a site that can redirect to the streaming service providers
-                    const movieLink = ssP[j]
-                    individualMovie['links'] = movieLink 
-                } else if( j == "flatrate") {
-                    //console.log(`This is the ssP[j] ${JSON.stringify(ssP[j], null, 4)}`)
-                    const streaming = ssP[j]
-                    for(let k = 0; k < streaming.length; k++) { //going through the providers array
-                        for(let n in streaming[k]) { //going through each object in the provider's array so that the correct details can be extracted
-                            //console.log(streaming[k])
-                            providerObject = {"providerName": streaming[k].provider_name, "providerLogo": streaming[k].logo_path }
-                            //console.log(JSON.stringify(providerObject,null,4))
-                        }
-                        individualMovie.providers.push(providerObject) //adds the providers' details into the nested array 
-                    } 
-                } 
-            }
-            resultsArray.push(individualMovie)   //adds a new movie object into the movie array
-        }
-
-        //console.log(`Here is the results array: ${JSON.stringify(resultsArray, null, 4)}`)
-        return(resultsArray);
-        
+    if (name.length === 0 ) {
+        return false
     } else {
-        //console.log("Invalid Name, Please Try Again")
-        return("Invalid Name, Please Try Again");
+        const response = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=faac618f8b55fe67036720b29d0f430d&query=${name}`)
+        const data = await response.json()
+        //console.log(JSON.stringify(data, null, 4))
+        var providerObject;
+    
+        if(data.total_results === 0) {  //making sure that the name is valid
+
+            return false
+            
+        } else {
+            //console.log("This is the data: " + JSON.stringify(data, null, 5))
+            const movieData = data.results
+            for(let i = 0; i < movieData.length; i++) {   //getting the movie info
+                const individualMovie = {"image": movieData[i].poster_path ,"title" : movieData[i].title, "movie_id": movieData[i].id, "overview": movieData[i].overview, "rating": movieData[i].vote_average, "release_date": movieData[i].release_date, "providers": []}
+                //console.log(individualMovie)
+
+                const getMovie_id = movieData[i].id
+                const response2 = await fetch(`https://api.themoviedb.org/3/movie/${getMovie_id}/watch/providers?api_key=faac618f8b55fe67036720b29d0f430d`)
+                const data2 = await response2.json()
+                const ssP = data2.results.GB //ssp = streaming service providers
+                if(ssP !== undefined) {
+                    console.log(JSON.stringify(ssP, null, 4))
+                    individualMovie['links'] = ssP.link
+
+                    console.log(`This is the ssP flatrate ${JSON.stringify(ssP.flatrate, null, 4)}`)
+                    if (ssP.flatrate !== undefined){
+                        const streaming = ssP.flatrate
+                        for(let k = 0; k < streaming.length; k++) { //going through the providers array
+                            for(let n in streaming[k]) { //going through each object in the provider's array so that the correct details can be extracted
+                                console.log(JSON.stringify(streaming[k], null, 4))
+                                providerObject = {"providerName": streaming[k].provider_name, "providerLogo": streaming[k].logo_path }
+                                //console.log(JSON.stringify(providerObject,null,4))
+                            }
+                            individualMovie.providers.push(providerObject) //adds the providers' details into the nested array 
+                        } 
+                    } else {
+                        providerObject = null
+                    }
+                } else {
+                    individualMovie['links'] = []
+                }
+                //console.log(`Individual movie: ${JSON.stringify(individualMovie,null,4)}`)
+                resultsArray.push(individualMovie)   //adds a new movie object into the movie array
+            }
+
+            //console.log(`Here is the results array: ${JSON.stringify(resultsArray, null, 4)}`)
+            return(resultsArray);
+            
+        } 
     }
 }
 
@@ -102,11 +108,16 @@ async function outputFrontPage(filterName) { //front page movies displayed by de
     return output2;
 }
 
-async function outputMovie(movieName) { 
-    await resetResults();
-    const output1 = await getMovie(movieName)
-    //console.log(`This is the search output: ${JSON.stringify(output1, null, 4)}`)
-    iterate(output1)
+async function outputMovie(movieName) {
+    console.log(movieName)
+        await resetResults();
+        const output1 = await getMovie(movieName)
+        if( getMovie !== false) {
+        //console.log(`This is the search output: ${JSON.stringify(output1, null, 4)}`)
+            iterate(output1)
+        } else {
+            return("Failed")
+        }
 
 }
 
@@ -141,7 +152,11 @@ function createCard(title, description, image, rating, releaseDate, streamingSer
 
     const eventImg = document.createElement("img")
     eventImg.classList.add("eventImg")
-    eventImg.src = `https://image.tmdb.org/t/p/original/${image}`
+    if( image == null ) {
+        eventImg.src = "../assets/no_image_available.png"
+    } else {
+        eventImg.src = `https://image.tmdb.org/t/p/original/${image}`
+    }
 
     const eventDesc = document.createElement("p")
     eventDesc.classList.add("eventDesc")
@@ -157,29 +172,55 @@ function createCard(title, description, image, rating, releaseDate, streamingSer
 
     const eventSS = document.createElement("div")
     eventSS.classList.add(`eventSS`)
-    eventSS.innerText = `These are the streaming services: ${streamingServices}`
+    console.log(JSON.stringify(streamingServices, null, 4))
+    if (streamingServices.length > 0) {
+        //eventSS.innerText = `${streamingServices}`
+        for (let i = 0; i < streamingServices.length; i++){
+            var anotherProvider = document.createElement("div")
+            anotherProvider.classList.add("providerList")
+
+            var providerImg = document.createElement("img")
+            providerImg.classList.add("providerImg")
+            providerImg.src = `https://image.tmdb.org/t/p/original/${streamingServices[i].providerLogo}`
+
+            eventSS.appendChild(anotherProvider)
+            anotherProvider.appendChild(providerImg)
+        }
+    } else {
+        eventSS.innerText = "This Movie is Not Available for Streaming in the UK"
+    }
 
     const eventLinks = document.createElement("a")
     eventLinks.classList.add(`eventLinks`)
-    eventLinks.href = link
-    eventLinks.innerHTML = "hello"
+    console.log("this is a link check " + link)
+    if (link.length > 0){
+        eventLinks.href = link
+        eventLinks.innerHTML = "Where to Watch"
+    } else {
+        eventLinks.innerHTML = "Not available to watch"
+    }
 
     //appending everything together
     movieCard.appendChild(eventDiv)
     eventDiv.appendChild(eventImg)
     eventDiv.appendChild(eventName)
-    //eventDiv.appendChild(eventDesc)
-    //eventDiv.appendChild(eventDate)
     eventDiv.appendChild(eventRating)
     eventDiv.appendChild(eventSS)
     eventDiv.appendChild(eventLinks)
 }
 
 const searchButton = document.querySelector('.searchButton')
-
 searchButton.addEventListener('click', () =>{
     const input1 = document.querySelector('input').value
     outputMovie(input1)
+})
+
+const searchBox = document.querySelector('input')
+searchBox.addEventListener('keypress', function (e) {
+    if(e.key === "Enter"){
+        const input1 = document.querySelector('input').value
+        outputMovie(input1)
+    }
 })
 
 async function resetResults() {
@@ -192,12 +233,28 @@ async function resetResults() {
 }
 
 const resetButton = document.querySelector('.resetButton')
-
 resetButton.addEventListener('click', () => {
     resetResults();
 })
 
 
 
-
+//.....................//
+// for(let j in ssP) { //getting the steaming service providers
+                //     if( j == "link") { //checking if there is a link to a site that can redirect to the streaming service providers
+                //         const movieLink = ssP[j]
+                //         individualMovie['links'] = movieLink 
+                //     } else if( j == "flatrate") {
+                //         //console.log(`This is the ssP[j] ${JSON.stringify(ssP[j], null, 4)}`)
+                //         const streaming = ssP[j]
+                //         for(let k = 0; k < streaming.length; k++) { //going through the providers array
+                //             for(let n in streaming[k]) { //going through each object in the provider's array so that the correct details can be extracted
+                //                 //console.log(streaming[k])
+                //                 providerObject = {"providerName": streaming[k].provider_name, "providerLogo": streaming[k].logo_path }
+                //                 //console.log(JSON.stringify(providerObject,null,4))
+                //             }
+                //             individualMovie.providers.push(providerObject) //adds the providers' details into the nested array 
+                //         } 
+                //     } 
+                // }
 
